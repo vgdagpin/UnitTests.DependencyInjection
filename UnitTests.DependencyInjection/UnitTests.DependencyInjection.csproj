@@ -8,8 +8,8 @@
 	  <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	  <Copyright>Copyright (c) 2024</Copyright>
 	  <Version>1.0.0.1</Version>
-	  <RepositoryUrl>https://github.com/mgdagpin/TasqR</RepositoryUrl>
-	  <PackageProjectUrl>https://github.com/mgdagpin/TasqR</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/vgdagpin/UnitTests.DependencyInjection</RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/vgdagpin/UnitTests.DependencyInjection</PackageProjectUrl>
 	  <IncludeSymbols>True</IncludeSymbols>
 	  <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <Nullable>enable</Nullable>

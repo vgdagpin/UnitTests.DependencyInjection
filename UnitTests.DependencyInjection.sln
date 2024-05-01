@@ -5,7 +5,12 @@ VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.DependencyInjection", "UnitTests.DependencyInjection\UnitTests.DependencyInjection.csproj", "{9055D918-DF21-455A-96DF-A88EAADCD1E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.DependencyInjection.Tests", "UnitTests.DependencyInjection.Tests\UnitTests.DependencyInjection.Tests.csproj", "{4EE8CAC7-21D2-4938-83F8-DE37A97722FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.DependencyInjection.Tests", "UnitTests.DependencyInjection.Tests\UnitTests.DependencyInjection.Tests.csproj", "{4EE8CAC7-21D2-4938-83F8-DE37A97722FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BFC5B7B0-3F9F-4857-90F2-3515808003A4}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
