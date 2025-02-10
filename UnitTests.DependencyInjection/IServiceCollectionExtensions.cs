@@ -9,19 +9,22 @@ namespace UnitTests.DependencyInjection
     {
         public static TestServiceProvider? TestServiceProvider;
 
-        public static TestServiceProvider BuildTestServiceProvider(this IServiceCollection serviceCollection)
-            => TestServiceProvider ??= new TestServiceProvider(serviceCollection.BuildServiceProvider(), serviceCollection);
+        public static IServiceProvider BuildTestServiceProvider(this IServiceCollection serviceCollection, Func<Type, object?[], object?>? instanceActivator = null)
+            => TestServiceProvider ??= new TestServiceProvider(serviceCollection.BuildServiceProvider(), serviceCollection, instanceActivator);
     }
 
     public sealed class TestServiceProvider : IServiceProvider
     {
+        private readonly Func<Type, object?[], object?>? instanceActivator;
+
         public IServiceProvider ServiceProvider { get; }
         public IServiceCollection Services { get; }
 
-        public TestServiceProvider(IServiceProvider serviceProvider, IServiceCollection services)
+        public TestServiceProvider(IServiceProvider serviceProvider, IServiceCollection services, Func<Type, object?[], object?>? instanceActivator = null)
         {
             ServiceProvider = serviceProvider;
             Services = services;
+            this.instanceActivator = instanceActivator;
         }
 
         public object? GetService(Type serviceType)
@@ -55,6 +58,11 @@ namespace UnitTests.DependencyInjection
                 var ctorParameters = constructors[0].GetParameters()
                     .Select(a => GetTestServiceOrNull(this, a.ParameterType))
                     .ToArray();
+
+                if (instanceActivator != null)
+                {
+                    return instanceActivator(serviceType, ctorParameters) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
+                }
 
                 return Activator.CreateInstance(serviceType, ctorParameters) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
             }
