@@ -26,13 +26,5 @@ jobs:
           dotnet build --configuration Release
           dotnet pack --configuration Release --output ./nupkg
 
-      - name: 🔑 Authenticate with NuGet
-        run: |
-          dotnet nuget add source https://api.nuget.org/v3/index.json \
-            --name nuget.org \
-            --username vgdagpin \
-            --password ${{ secrets.NUGET_API_KEY }} \
-            --store-password-in-clear-text
-
       - name: 🚀 Push to NuGet
         run: dotnet nuget push "./nupkg/*.nupkg" --source "nuget.org" --api-key ${{ secrets.NUGET_API_KEY }}
