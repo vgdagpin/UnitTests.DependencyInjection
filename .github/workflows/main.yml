@@ -35,4 +35,4 @@ jobs:
             "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
 
       - name: 🚀 Push to GitHub Packages
-        run: dotnet nuget push "./nupkg/*.nupkg" --source "github"
+        run: dotnet nuget push "./nupkg/*.nupkg" --source "github" --api-key ${{ secrets.PUBLISHPACKAGE }}
