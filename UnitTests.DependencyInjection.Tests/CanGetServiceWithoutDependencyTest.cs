@@ -18,7 +18,7 @@ public class CanGetServiceWithoutDependencyTest
 
         public bool Run()
         {
-            throw new NotImplementedException();
+            return true;
         }
     }
 
@@ -145,7 +145,7 @@ public class CanGetServiceWithoutDependencyTest
         var vehicleFactory = services.GetRequiredService<VehicleFactory>();
 
         Assert.IsNotNull(vehicleFactory);
-        Assert.IsNull(vehicleFactory.Vehicle);
+        Assert.IsNull(vehicleFactory.Vehicle, "Vehicle should be null");
         Assert.IsNotNull(vehicleFactory.Painter);
 
         Assert.IsInstanceOfType<Painter>(vehicleFactory.Painter);

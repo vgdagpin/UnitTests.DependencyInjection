@@ -7,10 +7,8 @@ namespace UnitTests.DependencyInjection
 {
     public static class IServiceCollectionExtensions
     {
-        public static TestServiceProvider? TestServiceProvider;
-
         public static IServiceProvider BuildTestServiceProvider(this IServiceCollection serviceCollection, params Delegate[] activators)
-            => TestServiceProvider ??= new TestServiceProvider(serviceCollection.BuildServiceProvider(), serviceCollection, activators);
+            => new TestServiceProvider(serviceCollection.BuildServiceProvider(), serviceCollection, activators);
     }
 
     public sealed class TestServiceProvider : IServiceProvider
