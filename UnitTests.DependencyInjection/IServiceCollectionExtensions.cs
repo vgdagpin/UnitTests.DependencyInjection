@@ -9,22 +9,22 @@ namespace UnitTests.DependencyInjection
     {
         public static TestServiceProvider? TestServiceProvider;
 
-        public static IServiceProvider BuildTestServiceProvider(this IServiceCollection serviceCollection, Func<Type, object?[], object?>? instanceActivator = null)
-            => TestServiceProvider ??= new TestServiceProvider(serviceCollection.BuildServiceProvider(), serviceCollection, instanceActivator);
+        public static IServiceProvider BuildTestServiceProvider(this IServiceCollection serviceCollection, params Delegate[] activators)
+            => TestServiceProvider ??= new TestServiceProvider(serviceCollection.BuildServiceProvider(), serviceCollection, activators);
     }
 
     public sealed class TestServiceProvider : IServiceProvider
     {
-        private readonly Func<Type, object?[], object?>? instanceActivator;
+        private readonly Delegate[] activators;
 
         public IServiceProvider ServiceProvider { get; }
         public IServiceCollection Services { get; }
 
-        public TestServiceProvider(IServiceProvider serviceProvider, IServiceCollection services, Func<Type, object?[], object?>? instanceActivator = null)
+        public TestServiceProvider(IServiceProvider serviceProvider, IServiceCollection services, params Delegate[] activators)
         {
             ServiceProvider = serviceProvider;
             Services = services;
-            this.instanceActivator = instanceActivator;
+            this.activators = activators;
         }
 
         public object? GetService(Type serviceType)
@@ -59,18 +59,47 @@ namespace UnitTests.DependencyInjection
                     .Select(a => GetTestServiceOrNull(this, a.ParameterType))
                     .ToArray();
 
-                if (instanceActivator != null)
+                foreach (var activator in activators)
                 {
-                    return instanceActivator(serviceType, ctorParameters) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
+                    if (activator.Method.ReturnType == serviceType)
+                    {
+                        var parameters = activator.Method.GetParameters();
+                        var firstParam = activator.Method.GetParameters().FirstOrDefault();
+
+                        if (firstParam != null && firstParam.ParameterType == typeof(IServiceProvider))
+                        {
+                            return activator.DynamicInvoke(new object?[] { this }) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
+                        }
+
+                        return activator.DynamicInvoke(new object?[] { }) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
+                    }
                 }
 
                 return Activator.CreateInstance(serviceType, ctorParameters) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
             }
+            else
+            {
+                foreach (var activator in activators)
+                {
+                    if (activator.Method.ReturnType == serviceType)
+                    {
+                        var parameters = activator.Method.GetParameters();
+                        var firstParam = activator.Method.GetParameters().FirstOrDefault();
 
-            throw new ArgumentException("Unable to create object");
+                        if (firstParam != null && firstParam.ParameterType == typeof(IServiceProvider))
+                        {
+                            return activator.DynamicInvoke(new object?[] { this }) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
+                        }
+
+                        return activator.DynamicInvoke(new object?[] { }) ?? throw new ArgumentNullException("Instance of " + serviceType.Name);
+                    }
+                }
+            }
+
+            return null;
         }
 
-        static object? GetTestServiceOrNull(TestServiceProvider serviceProvider, Type serviceType)
+        object? GetTestServiceOrNull(TestServiceProvider serviceProvider, Type serviceType)
         {
             // lets try getting it first from registered services
             // if not found or cannot be instantiated due to dependencies
@@ -83,6 +112,9 @@ namespace UnitTests.DependencyInjection
                 {
                     return services.First();
                 }
+
+
+                return GetServiceForceInstance(serviceType);
             }
             catch
             {
@@ -113,7 +145,7 @@ namespace UnitTests.DependencyInjection
             return null;
         }
 
-        static bool TryGetTestService(TestServiceProvider serviceProvider, Type serviceType, out object? result)
+        bool TryGetTestService(TestServiceProvider serviceProvider, Type serviceType, out object? result)
         {
             result = GetTestServiceOrNull(serviceProvider, serviceType);
 
